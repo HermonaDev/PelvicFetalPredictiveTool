@@ -15,16 +15,19 @@ y = df['delivery_outcome']
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initialize XGBoost model with tuned parameters
+# Initialize XGBoost model with optimized parameters
 model = XGBClassifier(
-    n_estimators=500,           # More trees for better learning
-    learning_rate=0.01,         # Slower learning for stability
-    max_depth=7,                # Deeper trees for complex patterns
+    n_estimators=1000,          # More trees
+    learning_rate=0.005,        # Very slow learning for precision
+    max_depth=8,                # Deeper trees for complex patterns
+    min_child_weight=1,         # Prevent overfitting
+    subsample=0.8,              # Use 80% of data per tree
+    colsample_bytree=0.8,      # Use 80% of features per tree
     random_state=42,
     eval_metric='logloss'
 )
 
-# Train model (no early stopping to avoid API issues)
+# Train model
 model.fit(X_train, y_train)
 
 # Evaluate model
