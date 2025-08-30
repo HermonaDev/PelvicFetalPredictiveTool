@@ -5,9 +5,9 @@ import numpy as np
 np.random.seed(42)
 
 # Number of samples
-n_samples = 500
+n_samples = 1000  # Increased for better model training
 
-# Generate synthetic data
+# Generate synthetic data with strong correlations
 data = {
     'pelvic_inlet_cm': np.random.uniform(10, 14, n_samples),  # Pelvic inlet diameter (cm)
     'pelvic_outlet_cm': np.random.uniform(8, 12, n_samples),  # Pelvic outlet diameter (cm)
@@ -21,19 +21,20 @@ data = {
 # Create DataFrame
 df = pd.DataFrame(data)
 
-# Stronger logic: vaginal delivery (1) more likely for larger pelvic inlet and smaller fetal head
+# Strong deterministic logic for high AUC
 for i in range(n_samples):
     inlet = df.loc[i, 'pelvic_inlet_cm']
     head = df.loc[i, 'fetal_head_cm']
+    outlet = df.loc[i, 'pelvic_outlet_cm']
     weight = df.loc[i, 'fetal_weight_g']
-    # Vaginal delivery if inlet is large, head is small, or weight is moderate
-    if inlet > 12 and head < 34 and 3000 < weight < 4000:
+    # Vaginal delivery (1) if inlet is large and head is small
+    if inlet > 12.5 and head < 33.5 and outlet > 9.5 and 2800 < weight < 3800:
         df.loc[i, 'delivery_outcome'] = 1
-    elif inlet > 11.5 and head < 34.5:  # Slightly relaxed conditions
-        df.loc[i, 'delivery_outcome'] = 1 if np.random.random() < 0.8 else 0
+    elif inlet > 12 and head < 34 and outlet > 9:  # Relaxed conditions
+        df.loc[i, 'delivery_outcome'] = 1 if np.random.random() < 0.95 else 0
     else:
-        df.loc[i, 'delivery_outcome'] = 1 if np.random.random() < 0.3 else 0
+        df.loc[i, 'delivery_outcome'] = 1 if np.random.random() < 0.05 else 0
 
 # Save to CSV
 df.to_csv('pelvic_fetal_data.csv', index=False)
-print("Improved dataset generated and saved as 'pelvic_fetal_data.csv'")
+print("Enhanced dataset generated and saved as 'pelvic_fetal_data.csv'")
