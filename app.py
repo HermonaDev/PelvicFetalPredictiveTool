@@ -40,9 +40,26 @@ if st.button("Predict"):
     shap_dict = dict(zip(feature_names, shap_values.values[0]))
     st.subheader("Factors Influencing Prediction (SHAP Values)")
     st.write("Positive = increases vaginal delivery chance; Negative = increases cesarean chance.")
-    fig_shap = go.Figure(go.Bar(x=list(shap_dict.values()), y=list(shap_dict.keys()), orientation='h'))
-    fig_shap.update_layout(title="SHAP Feature Importance", xaxis_title="Impact on Prediction")
-    st.plotly_chart(fig_shap)
+
+    # Enhanced SHAP graph
+    fig_shap = go.Figure()
+    for i, (feature, value) in enumerate(shap_dict.items()):
+        color = 'green' if value > 0 else 'red'
+        fig_shap.add_trace(go.Bar(
+            x=[value], y=[feature], orientation='h',
+            marker_color=color, name=feature,
+            text=[f"{value:.2f}"], textposition='auto'
+        ))
+    fig_shap.update_layout(
+        title="SHAP Feature Importance",
+        xaxis_title="Impact on Prediction (SHAP Value)",
+        yaxis_title="Features",
+        font=dict(size=14),
+        bargap=0.2,
+        showlegend=False,
+        margin=dict(l=150)
+    )
+    st.plotly_chart(fig_shap, use_container_width=True)
 
     st.subheader("Fetal Passage Visualization")
     fetal_head_diameter = fetal_head / np.pi
